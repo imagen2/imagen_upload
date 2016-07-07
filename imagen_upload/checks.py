@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ##########################################################################
-# NSAp - Copyright (C) CEA, 2013
+# NSAp - Copyright (C) CEA, 2016
 # Distributed under the terms of the CeCILL-B license, as published by
 # the CEA-CNRS-INRIA. Refer to the LICENSE file or to
 # http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html
@@ -15,12 +15,14 @@ import traceback
 
 from cubes.rql_upload.tools import get_or_create_logger
 from imagen.sanity import cantab, imaging
+from . import cati
 
 SID_ERROR_MESSAGE = ("- The subject ID is malformed."
                      " [12 decimal digits required]<br/>")
 
 UPLOAD_ALREADY_EXISTS = ("- A similar upload already exists."
-                         " [Same subject ID and not rejected upload]."
+                         " [Same subject ID and time point "
+                         " and not rejected upload]."
                          " Please contact an administrator if you want"
                          " to force the upload.<br/>")
 
@@ -30,6 +32,14 @@ SYSTEM_ERROR_RAISED = ("- A system error raised."
 
 
 def get_message_error(flag, errors):
+    """ Generate a message error from error list.
+
+
+    Pameters:
+        flag: True or False. True mean 'has errors'
+        errors: error list
+    """
+
     message = ''
     if not flag:
         for err in errors:
@@ -56,10 +66,11 @@ def is_PSC1(upload):
 
 
 def is_aldready_uploaded(upload):
-    """ Cheks if an equivalent upload is already done.
+    """ Checks if an equivalent upload is already done.
         To be equivalent an upload must have:
             a status different than 'Rejected' and
-            a uploadfield with equal SID
+            a uploadfield with equal SID and
+            a uploadfield with equal TIME_POINT
 
     Pameters:
         upload: A CWUpload object
@@ -71,13 +82,15 @@ def is_aldready_uploaded(upload):
            " NOT X eid '{}',"
            " X form_name ILIKE '{}',"
            " NOT X status 'Rejected',"
-           " X upload_fields F,"
-           " F name 'sid',"
-           " F value '{}'")
+           " X upload_fields F1, F1 name 'sid', F1 value '{}',"
+           " X upload_fields F2, F2 name 'time_point', F2 value '{}'"
+           )
     rql = rql.format(
         upload.eid,
         upload.form_name,
-        upload.get_field_value('sid'))
+        upload.get_field_value('sid'),
+        upload.get_field_value('time_point')
+    )
     rset = upload._cw.execute(rql)
     if rset.rows[0][0] == 0L:
         return False
@@ -86,6 +99,17 @@ def is_aldready_uploaded(upload):
 
 
 def synchrone_check_cantab(upload):
+    """ Call is_PSC1 and is_aldready_uploaded methods first.
+        Then call methods of imagen.sanity.cantab
+        than checks name file and content
+
+    Pameters:
+        upload: A CWUpload object
+
+    Return:
+        Return (True, None) if valid else return (False, message)
+    """
+
     message = ''
     # checks
     if not is_PSC1(upload):
@@ -136,6 +160,9 @@ def synchrone_check_cantab(upload):
 def asynchrone_check_cantab(repository):
     """ Copy uploaded cantab files from 'upload_dir' to 'validated_dir/...'
         and set status 'validated'
+
+    Pameters:
+        upload: A cubicweb repository object
     """
 
     logger = get_or_create_logger(repository.vreg.config)
@@ -189,48 +216,84 @@ def asynchrone_check_cantab(repository):
 
 
 def synchrone_check_rmi(upload):
-    error = ''
+    """ Call is_PSC1 and is_aldready_uploaded methods first.
+        Then call methods of imagen.sanity.imaging
+        than checks name file and content
+
+    Pameters:
+        upload: A CWUpload object
+
+    Return:
+        Return (True, None) if valid else return (False, message)
+    """
+
+    message = ''
     # checks
     if not is_PSC1(upload):
-        error += SID_ERROR_MESSAGE
+        message += SID_ERROR_MESSAGE
     if is_aldready_uploaded(upload):
-        error += UPLOAD_ALREADY_EXISTS
+        message += UPLOAD_ALREADY_EXISTS
     #dimitri check
-    psc1, errors = imaging.check(upload.upload_files[0].get_file_path())
-    if not psc1:
-        for err in errors:
-            error += err.__str__()
-            error += u'<br/>'
+    sid = upload.get_field_value('sid')
+    tid = upload.get_field_value('time_point')
+    ufile = upload.upload_files[0]
+    psc1, errors = imaging.check_zip_name(ufile.data_name, sid, tid)
+    message += get_message_error(psc1, errors)
+    psc1, errors = imaging.check_zip_content(
+        ufile.get_file_path(), sid, tid)
+    message += get_message_error(psc1, errors)
+
     # return
-    if error:
-        return (False, error)
+    if message:
+        return (False, message)
     else:
         return (True, None)
 
 
 def asynchrone_check_rmi(repository):
+    """ For each 'Quarantine' CWUpload,
+        send the file to cati repository if not already sent.
+        Retrieve a response from cati.
+        If there is a response then define status and error message to
+        CWUpload following response content
 
-    logger = get_or_create_logger(repository.vreg.config)
-    validated_dir = repository.vreg.config["validated_directory"]
+    Pameters:
+        upload: A cubicweb repository object
+    """
+
+    config = repository.vreg.config
+    logger = get_or_create_logger(config)
+    validated_dir = config["validated_directory"]
+
+    cati.LOGGER = logger
+    cati.CATI_WORFLOW_DIRECTORY = config["cati_workflow_directory"]
+    if not cati.is_system_OK():
+        return
+
     rql = ("Any X WHERE X is CWUpload,"
            " X form_name ILIKE 'MRI', X status 'Quarantine'")
     with repository.internal_cnx() as cnx:
         rset = cnx.execute(rql)
         for entity in rset.entities():
-            sid = entity.get_field_value('sid')
-            centre = entity.get_field_value('centre')
-            tp = entity.get_field_value('time_point')
+            args = {f.name: f.value for f in entity.upload_fields}
+            sid = args['sid']
+            centre = args['centre']
+            tp = args['time_point']
             try:
-                psc1, errors = imaging.extended_check(
-                    entity.upload_files[0].get_file_path())
-                error = ''
-                if not psc1:
-                    for err in errors:
-                        error += err.__str__()
-                        error += u'<br/>'
+                # send uploaded file to cati
+                cati.send_entry(
+                    entity.upload_files[0].data_name,
+                    entity.upload_files[0].get_file_path(),
+                    args
+                )
+                # retrieve response from cati
+                response = cati.get_response(entity.upload_files[0].data_name)
+                if response is None:
+                    continue
+                if response[0] == "Rejected":
                     rql = ("SET X status 'Rejected', X error '{}'"
                            " WHERE X is CWUpload, X eid {}".format(
-                               error, entity.eid))
+                               response[1], entity.eid))
                 else:
                     from_file = entity.upload_files[0].get_file_path()
                     to_file = u'{0}/{1}/{2}/{3}'.format(
@@ -256,6 +319,7 @@ def asynchrone_check_rmi(repository):
                     rql = ("SET X status 'Validated'"
                            " WHERE X is CWUpload, X eid '{}'".format(
                                entity.eid))
+                cati.set_done(entity.upload_files[0].data_name)
                 cnx.execute(rql)
             except:
                 stacktrace = traceback.format_exc()

@@ -10,12 +10,12 @@
 
 options = (
     (
-        "validated_directory",
+        "cati_workflow_directory",
         {
             "type": "string",
             "default": "",
-            "help": ("base directory in which the validated files"
-                     " are copy from upload_directory."),
+            "help": ("base directory in which the files"
+                     " to manage cati workflow uploaded file validation."),
             "group": "imagen_upload", "level": 0,
         }
     ),
