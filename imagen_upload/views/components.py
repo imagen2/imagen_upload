@@ -12,10 +12,10 @@ from cubicweb.web import component
 
 # Cubes import
 from cubes.piws.views.components import PIWSNavigationtBox
-from cubes.rql_upload.views.components import CWUploadedBox
+from cubes.rql_upload.views.components import CWUploadBox
 
 
-class IMAGENCWUploadedBox(CWUploadedBox):
+class IMAGENCWUploadedBox(CWUploadBox):
     """ Class that generate a left box on the web browser to access all user
         and group uploads.
 
@@ -27,9 +27,9 @@ class IMAGENCWUploadedBox(CWUploadedBox):
     def render_body(self, w, **kwargs):
         super(IMAGENCWUploadedBox, self).render_body(w, **kwargs)
 
-        rql = ("DISTINCT Any G WHERE G is CWGroup,"
+        rql = ("DISTINCT Any G ORDERBY N WHERE G is CWGroup,"
                " G description ILIKE '%acquisition_centre%',"
-               " U in_group G, U login '{}'")
+               " U in_group G, U login '{}', G name N")
         rql = rql.format(self._cw.user_data()['login'])
         rset = self._cw.execute(rql)
         for entity in rset.entities():
@@ -44,6 +44,7 @@ class IMAGENCWUploadedBox(CWUploadedBox):
             w(u'<div class="btn-toolbar">')
             w(u'<div class="btn-group-vertical btn-block">')
             w(u'<a class="btn btn-primary" href="{0}">'.format(href))
+            w(u'<span class="glyphicon glyphicon glyphicon-cloud-upload"></span>')
             w(u'{} uploads</a>'.format(entity.name))
             w(u'</div></div><br/>')
 
@@ -71,13 +72,14 @@ class DashboardsBox(component.CtxComponent):
         w(u'<div class="btn-toolbar">')
         w(u'<div class="btn-group-vertical btn-block">')
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
+        w(u'<span class="glyphicon glyphicon glyphicon-list-alt"></span>')
         w(u'My dashboard</a>')
         w(u'</div></div><br/>')
 
         # centre dashboard
-        rql = ("DISTINCT Any G WHERE G is CWGroup,"
+        rql = ("DISTINCT Any G ORDERBY N WHERE G is CWGroup,"
                " G description ILIKE '%acquisition_centre%',"
-               " U in_group G, U login '{}'")
+               " U in_group G, U login '{}', G name N")
         rql = rql.format(self._cw.user_data()['login'])
         rset = self._cw.execute(rql)
         for entity in rset.entities():
@@ -89,6 +91,7 @@ class DashboardsBox(component.CtxComponent):
             w(u'<div class="btn-toolbar">')
             w(u'<div class="btn-group-vertical btn-block">')
             w(u'<a class="btn btn-primary" href="{0}">'.format(href))
+            w(u'<span class="glyphicon glyphicon glyphicon-list-alt"></span>')
             w(u'{} dashboard</a>'.format(entity.name))
             w(u'</div></div><br/>')
 
@@ -97,5 +100,5 @@ def registration_callback(vreg):
 
     # Update components
     vreg.unregister(PIWSNavigationtBox)
-    vreg.register_and_replace(IMAGENCWUploadedBox, CWUploadedBox)
+    vreg.register_and_replace(IMAGENCWUploadedBox, CWUploadBox)
     vreg.register(DashboardsBox)

@@ -48,24 +48,22 @@ def get_message_error(flag, errors):
     return message
 
 
-def is_PSC1(upload):
-    """ Cheks if sid field value is well formated (12 decimal digits)
+def is_PSC1(value):
+    """ Cheks if  value is well formated (12 decimal digits)
 
     Pameters:
-        upload: A CWUpload object
+        value: a value reprsenting a PSC1
 
-    Return:cubes/imagen/views/components.py
+    Return:
         Return True value match with the pattern, False otherwise
     """
-
-    sid = upload.get_field_value('sid')
-    if re.match("^\d{12}$", sid) is None:
+    if re.match("^\d{12}$", value) is None:
         return False
     else:
         return True
 
 
-def is_aldready_uploaded(upload):
+def is_aldready_uploaded(connexion, posted, formname, uid):
     """ Checks if an equivalent upload is already done.
         To be equivalent an upload must have:
             a status different than 'Rejected' and
@@ -73,7 +71,10 @@ def is_aldready_uploaded(upload):
             a uploadfield with equal TIME_POINT
 
     Pameters:
-        upload: A CWUpload object
+        connexion: connexion use to query
+        posted: dictionnary of form posted fields
+        formname: form name
+        uid: current created CWUpload id
 
     Return:
         Return True if an equivalent upload is already done, False otherwise
@@ -86,45 +87,51 @@ def is_aldready_uploaded(upload):
            " X upload_fields F2, F2 name 'time_point', F2 value '{}'"
            )
     rql = rql.format(
-        upload.eid,
-        upload.form_name,
-        upload.get_field_value('sid'),
-        upload.get_field_value('time_point')
+        uid,
+        formname,
+        posted['sid'],
+        posted['time_point']
     )
-    rset = upload._cw.execute(rql)
+    rset = connexion.execute(rql)
     if rset.rows[0][0] == 0L:
         return False
     else:
         return True
 
 
-def synchrone_check_cantab(upload):
+def synchrone_check_cantab(connexion, posted, upload, files, fields):
     """ Call is_PSC1 and is_aldready_uploaded methods first.
         Then call methods of imagen.sanity.cantab
         than checks name file and content
 
     Pameters:
-        upload: A CWUpload object
+        connexion: connexion use to query
+        posted: dictionnary of form posted fields
+        upload: CWUpload entity
+        files: UploafFile entities
+        fields: UploafField entities
 
     Return:
-        Return (True, None) if valid else return (False, message)
+        Return None if checks pass, error message otherwise
     """
 
     message = ''
     # checks
-    if not is_PSC1(upload):
+    # checks
+    if not is_PSC1(posted['sid']):
         message += SID_ERROR_MESSAGE
-    if is_aldready_uploaded(upload):
+    if is_aldready_uploaded(connexion, posted, upload.form_name, upload.eid):
         message += UPLOAD_ALREADY_EXISTS
 
     #dimitri check
-    sid = upload.get_field_value('sid')
-    tid = upload.get_field_value('time_point')
-    for ufile in upload.upload_files:
-        psc1 = True
-        errors = None
+    sid = posted['sid']
+    tid = posted['time_point']
+    psc1 = True
+    errors = None
+    for ufile in files:
         if ufile.name == 'cant':
-            psc1, errors = cantab.check_cant_name(ufile.data_name, sid, tid)
+            psc1, errors = cantab.check_cant_name(
+                ufile.data_name, sid, tid)
             message += get_message_error(psc1, errors)
             psc1, errors = cantab.check_cant_content(
                 ufile.get_file_path(), sid, tid)
@@ -144,7 +151,8 @@ def synchrone_check_cantab(upload):
                 ufile.get_file_path(), sid, tid)
             message += get_message_error(psc1, errors)
         elif ufile.name == 'report':
-            psc1, errors = cantab.check_report_name(ufile.data_name, sid, tid)
+            psc1, errors = cantab.check_report_name(
+                ufile.data_name, sid, tid)
             message += get_message_error(psc1, errors)
             psc1, errors = cantab.check_report_content(
                 ufile.get_file_path(), sid, tid)
@@ -152,9 +160,9 @@ def synchrone_check_cantab(upload):
 
     # return
     if message:
-        return (False, message)
+        return message
     else:
-        return (True, None)
+        return None
 
 
 def asynchrone_check_cantab(repository):
@@ -179,7 +187,7 @@ def asynchrone_check_cantab(repository):
                 tp = entity.get_field_value('time_point')
                 for eUFile in entity.upload_files:
                     from_file = eUFile.get_file_path()
-                    to_file = u'{0}/{1}/{2}/{3}'.format(
+                    to_file = u'{0}/{1}/{2}/{3}/AdditionnalData'.format(
                         validated_dir, tp, centre, sid)
                     if not os.path.exists(to_file):
                         os.makedirs(to_file)
@@ -211,43 +219,49 @@ def asynchrone_check_cantab(repository):
                            stacktrace,
                            entity.eid))
                 cnx.execute(rql)
-
         cnx.commit()
 
 
-def synchrone_check_rmi(upload):
+def synchrone_check_rmi(connexion, posted, upload, files, fields):
     """ Call is_PSC1 and is_aldready_uploaded methods first.
         Then call methods of imagen.sanity.imaging
         than checks name file and content
 
     Pameters:
-        upload: A CWUpload object
-
+        connexion: connexion use to query
+        posted: dictionnary of form posted fields
+        upload: CWUpload entity
+        files: UploafFile entities
+        fields: UploafField entities
     Return:
-        Return (True, None) if valid else return (False, message)
+        Return None if checks pass, error message otherwise
     """
 
     message = ''
     # checks
-    if not is_PSC1(upload):
+    if not is_PSC1(posted['sid']):
         message += SID_ERROR_MESSAGE
-    if is_aldready_uploaded(upload):
+    if is_aldready_uploaded(connexion, posted, upload.form_name, upload.eid):
         message += UPLOAD_ALREADY_EXISTS
+
     #dimitri check
-    sid = upload.get_field_value('sid')
-    tid = upload.get_field_value('time_point')
-    ufile = upload.upload_files[0]
-    psc1, errors = imaging.check_zip_name(ufile.data_name, sid, tid)
+    sid = posted['sid']
+    tid = posted['time_point']
+    binary = posted['file']
+    psc1 = True
+    errors = None
+    psc1, errors = imaging.check_zip_name(files[0].data_name, sid, tid)
+    print(dir(binary))
     message += get_message_error(psc1, errors)
     psc1, errors = imaging.check_zip_content(
-        ufile.get_file_path(), sid, tid)
+        files[0].get_file_path(), sid, tid)
     message += get_message_error(psc1, errors)
 
     # return
     if message:
-        return (False, message)
+        return message
     else:
-        return (True, None)
+        return None
 
 
 def asynchrone_check_rmi(repository):
