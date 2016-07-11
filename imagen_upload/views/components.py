@@ -30,7 +30,7 @@ class IMAGENCWUploadedBox(CWUploadBox):
         rql = ("DISTINCT Any G ORDERBY N WHERE G is CWGroup,"
                " G description ILIKE '%acquisition_centre%',"
                " U in_group G, U login '{}', G name N")
-        rql = rql.format(self._cw.user_data()['login'])
+        rql = rql.format(self._cw.user.login)
         rset = self._cw.execute(rql)
         for entity in rset.entities():
 #            if entity.name == 'managers' or entity.name == 'users':
@@ -68,7 +68,7 @@ class DashboardsBox(component.CtxComponent):
         href = self._cw.build_url(
             "view", vid="dashboard-view",
             title="My dashboard",
-            user=self._cw.user_data()['login'])
+            user=self._cw.user.login)
         w(u'<div class="btn-toolbar">')
         w(u'<div class="btn-group-vertical btn-block">')
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
@@ -80,7 +80,7 @@ class DashboardsBox(component.CtxComponent):
         rql = ("DISTINCT Any G ORDERBY N WHERE G is CWGroup,"
                " G description ILIKE '%acquisition_centre%',"
                " U in_group G, U login '{}', G name N")
-        rql = rql.format(self._cw.user_data()['login'])
+        rql = rql.format(self._cw.user.login)
         rset = self._cw.execute(rql)
         for entity in rset.entities():
             href = self._cw.build_url(

@@ -247,11 +247,9 @@ def synchrone_check_rmi(connexion, posted, upload, files, fields):
     #dimitri check
     sid = posted['sid']
     tid = posted['time_point']
-    binary = posted['file']
     psc1 = True
     errors = None
     psc1, errors = imaging.check_zip_name(files[0].data_name, sid, tid)
-    print(dir(binary))
     message += get_message_error(psc1, errors)
     psc1, errors = imaging.check_zip_content(
         files[0].get_file_path(), sid, tid)
