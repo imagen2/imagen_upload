@@ -140,3 +140,7 @@ input#rql, input#norql {
 body {
 background-color: #FDFDFD;
 }
+
+.control-label {
+    white-space: nowrap;
+}

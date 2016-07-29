@@ -9,6 +9,7 @@
 
 import hashlib
 import os
+import os.path
 import re
 import shutil
 import traceback
@@ -133,30 +134,35 @@ def synchrone_check_cantab(connexion, posted, upload, files, fields):
             psc1, errors = cantab.check_cant_name(
                 ufile.data_name, sid, tid)
             message += get_message_error(psc1, errors)
-            psc1, errors = cantab.check_cant_content(
-                ufile.get_file_path(), sid, tid)
-            message += get_message_error(psc1, errors)
+            filepath = ufile.get_file_path()
+            psc1, errors = cantab.check_cant_content(filepath, sid, tid)
+            message += get_message_error(psc1, errors).replace(
+                os.path.basename(filepath), ufile.data_name)
         elif ufile.name == 'datasheet':
             psc1, errors = cantab.check_datasheet_name(
                 ufile.data_name, sid, tid)
             message += get_message_error(psc1, errors)
-            psc1, errors = cantab.check_datasheet_content(
-                ufile.get_file_path(), sid, tid)
-            message += get_message_error(psc1, errors)
+            filepath = ufile.get_file_path()
+            psc1, errors = cantab.check_datasheet_content(filepath, sid, tid)
+            message += get_message_error(psc1, errors).replace(
+                os.path.basename(filepath), ufile.data_name)
         elif ufile.name == 'detailed_datasheet':
             psc1, errors = cantab.check_detailed_datasheet_name(
                 ufile.data_name, sid, tid)
             message += get_message_error(psc1, errors)
+            filepath = ufile.get_file_path()
             psc1, errors = cantab.check_detailed_datasheet_content(
-                ufile.get_file_path(), sid, tid)
-            message += get_message_error(psc1, errors)
+                filepath, sid, tid)
+            message += get_message_error(psc1, errors).replace(
+                os.path.basename(filepath), ufile.data_name)
         elif ufile.name == 'report':
             psc1, errors = cantab.check_report_name(
                 ufile.data_name, sid, tid)
             message += get_message_error(psc1, errors)
-            psc1, errors = cantab.check_report_content(
-                ufile.get_file_path(), sid, tid)
-            message += get_message_error(psc1, errors)
+            filepath = ufile.get_file_path()
+            psc1, errors = cantab.check_report_content(filepath, sid, tid)
+            message += get_message_error(psc1, errors).replace(
+                os.path.basename(filepath), ufile.data_name)
 
     # return
     if message:
@@ -249,15 +255,15 @@ def synchrone_check_rmi(connexion, posted, upload, files, fields):
     tid = posted['time_point']
     psc1 = True
     errors = None
+    filepath = files[0].get_file_path()
     psc1, errors = imaging.check_zip_name(files[0].data_name, sid, tid)
     message += get_message_error(psc1, errors)
-    psc1, errors = imaging.check_zip_content(
-        files[0].get_file_path(), sid, tid)
+    psc1, errors = imaging.check_zip_content(filepath, sid, tid)
     message += get_message_error(psc1, errors)
 
     # return
     if message:
-        return message
+        return message.replace(os.path.basename(filepath), files[0].data_name)
     else:
         return None
 
