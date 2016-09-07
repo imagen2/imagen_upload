@@ -18,35 +18,49 @@ from cubes.rql_upload.tools import get_or_create_logger
 from imagen.sanity import cantab, imaging
 from . import cati
 
-SID_ERROR_MESSAGE = ("- The subject ID is malformed."
-                     " [12 decimal digits required]<br/>")
+SID_ERROR_MESSAGE = ("<dl><dt>The subject ID is malformed.</dt>"
+                     "<dd>12 decimal digits required.</dd></dl>")
 
-UPLOAD_ALREADY_EXISTS = ("- A similar upload already exists."
-                         " [Same subject ID and time point "
-                         " and not rejected upload]."
-                         " Please contact an administrator if you want"
-                         " to force the upload.<br/>")
+UPLOAD_ALREADY_EXISTS = ("<dl><dt>A similar upload already exists.</dt>"
+                         "<dd>Same subject ID and time point "
+                         " and not rejected upload.</dd>"
+                         "<dd>Please contact an administrator if you want"
+                         " to force the upload.</dd></dl>")
 
-SYSTEM_ERROR_RAISED = ("- A system error raised."
+SYSTEM_ERROR_RAISED = ("<dl><dt>A system error raised.<dt>"
                        " Please send the following message"
-                       " to an administrator.")
+                       " to an administrator.</dd></dl>")
 
 
-def get_message_error(flag, errors):
-    """ Generate a message error from error list.
+def get_message_error(flag, errors, filename, pattern, filepath):
+    """ Generate a message error from error list regarding an uploaded file.
 
 
     Pameters:
         flag: True or False. True mean 'has errors'
         errors: error list
+        filename: file name provide by user during upload
+        pattern: pattern expected for file name
+        filepath: file path used by CW for uploaded file
     """
 
     message = ''
     if not flag:
+        message += u'<dl>'
+        message += u'<dt>File {} [{}]<dt>'.format(filename, pattern)
         for err in errors:
-            message += err.__str__()
-            message += u'<br/>'
-    return message
+            message += u'<dd>'
+            message += err.message
+            if err.path and err.path != filename and err.path != filepath and err.path != os.path.basename(filepath):
+                message += u' [{}]'.format(err.path)
+            if err.sample:
+                sample = repr(err.sample)
+                if len(sample) > err._SAMPLE_LEN:
+                    sample = sample[:err._SAMPLE_LEN] + '...'
+                message += u' [{}]'.format(sample)
+            message += u'<dd>'
+        message += u'</dl>'
+    return message.replace(os.path.basename(filepath), filename)
 
 
 def is_PSC1(value):
@@ -133,36 +147,48 @@ def synchrone_check_cantab(connexion, posted, upload, files, fields):
         if ufile.name == 'cant':
             psc1, errors = cantab.check_cant_name(
                 ufile.data_name, sid, tid)
-            message += get_message_error(psc1, errors)
+            message += get_message_error(
+                psc1, errors, ufile.data_name,
+                u'cant_&lt;PSC1&gt;&lt;TP&gt;.cclar', ufile.data_name)
             filepath = ufile.get_file_path()
             psc1, errors = cantab.check_cant_content(filepath, sid, tid)
-            message += get_message_error(psc1, errors).replace(
-                os.path.basename(filepath), ufile.data_name)
+            message += get_message_error(
+                psc1, errors, ufile.data_name,
+                u'cant_&lt;PSC1&gt;&lt;TP&gt;.cclar', filepath)
         elif ufile.name == 'datasheet':
             psc1, errors = cantab.check_datasheet_name(
                 ufile.data_name, sid, tid)
-            message += get_message_error(psc1, errors)
+            message += get_message_error(
+                psc1, errors, ufile.data_name,
+                u'datasheet_&lt;PSC1&gt;&lt;TP&gt;.csv', ufile.data_name)
             filepath = ufile.get_file_path()
             psc1, errors = cantab.check_datasheet_content(filepath, sid, tid)
-            message += get_message_error(psc1, errors).replace(
-                os.path.basename(filepath), ufile.data_name)
+            message += get_message_error(
+                psc1, errors, ufile.data_name,
+                u'datasheet_&lt;PSC1&gt;&lt;TP&gt;.csv', filepath)
         elif ufile.name == 'detailed_datasheet':
             psc1, errors = cantab.check_detailed_datasheet_name(
                 ufile.data_name, sid, tid)
-            message += get_message_error(psc1, errors)
+            message += get_message_error(
+                psc1, errors, ufile.data_name,
+                u'detailed_datasheet_&lt;PSC1&gt;&lt;TP&gt;.csv', ufile.data_name)
             filepath = ufile.get_file_path()
             psc1, errors = cantab.check_detailed_datasheet_content(
                 filepath, sid, tid)
-            message += get_message_error(psc1, errors).replace(
-                os.path.basename(filepath), ufile.data_name)
+            message += get_message_error(
+                psc1, errors, ufile.data_name,
+                u'detailed_datasheet_&lt;PSC1&gt;&lt;TP&gt;.csv', filepath)
         elif ufile.name == 'report':
             psc1, errors = cantab.check_report_name(
                 ufile.data_name, sid, tid)
-            message += get_message_error(psc1, errors)
+            message += get_message_error(
+                psc1, errors, ufile.data_name,
+                u'report_&lt;PSC1&gt;&lt;TP&gt;.html', ufile.data_name)
             filepath = ufile.get_file_path()
             psc1, errors = cantab.check_report_content(filepath, sid, tid)
-            message += get_message_error(psc1, errors).replace(
-                os.path.basename(filepath), ufile.data_name)
+            message += get_message_error(
+                psc1, errors, ufile.data_name,
+                u'report_&lt;PSC1&gt;&lt;TP&gt;.html', filepath)
 
     # return
     if message:
@@ -257,13 +283,17 @@ def synchrone_check_rmi(connexion, posted, upload, files, fields):
     errors = None
     filepath = files[0].get_file_path()
     psc1, errors = imaging.check_zip_name(files[0].data_name, sid, tid)
-    message += get_message_error(psc1, errors)
+    message += get_message_error(
+        psc1, errors, files[0].data_name,
+        u'&lt;PSC1&gt;&lt;TP&gt;.zip', files[0].data_name)
     psc1, errors = imaging.check_zip_content(filepath, sid, tid)
-    message += get_message_error(psc1, errors)
+    message += get_message_error(
+        psc1, errors, files[0].data_name,
+        u'&lt;PSC1&gt;&lt;TP&gt;.zip', filepath)
 
     # return
     if message:
-        return message.replace(os.path.basename(filepath), files[0].data_name)
+        return message
     else:
         return None
 
