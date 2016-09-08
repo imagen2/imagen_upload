@@ -28,7 +28,7 @@ class IMAGENCWUploadedBox(CWUploadBox):
         super(IMAGENCWUploadedBox, self).render_body(w, **kwargs)
 
         rql = ("DISTINCT Any G ORDERBY N WHERE G is CWGroup,"
-               " G description ILIKE '%acquisition_centre%',"
+               " G cwuri ILIKE '%ou=Centres%',"
                " U in_group G, U login '{}', G name N")
         rql = rql.format(self._cw.user.login)
         rset = self._cw.execute(rql)
@@ -78,7 +78,7 @@ class DashboardsBox(component.CtxComponent):
 
         # centre dashboard
         rql = ("DISTINCT Any G ORDERBY N WHERE G is CWGroup,"
-               " G description ILIKE '%acquisition_centre%',"
+               " G cwuri ILIKE '%ou=Centres%',"
                " U in_group G, U login '{}', G name N")
         rql = rql.format(self._cw.user.login)
         rset = self._cw.execute(rql)

@@ -9,7 +9,7 @@
 			    "label": "Acquisition Centre",
 			    "required": "True",
 			    "choices": [""],
-			    "rql": "DISTINCT Any C WHERE X is CWGroup, X description ILIKE '%acquisition_centre%', U login '{}', U in_group X, X name C:choices"},
+			    "rql": "DISTINCT Any C WHERE X is CWGroup, X cwuri ILIKE '%ou=Centres%', U login '{}', U in_group X, X name C:choices"},
 			{
 			    "name": "sid",
 			    "type": "StringField",
@@ -64,7 +64,7 @@
 			    "label": "Acquisition Centre",
 			    "required": "True",
 			    "choices": [""],
-			    "rql": "DISTINCT Any C WHERE X is CWGroup, X description ILIKE '%acquisition_centre%', U login '{}', U in_group X, X name C:choices"},
+			    "rql": "DISTINCT Any C WHERE X is CWGroup, X cwuri ILIKE '%ou=Centres%', U login '{}', U in_group X, X name C:choices"},
 			{
 			    "name": "sid",
 			    "type": "StringField",
