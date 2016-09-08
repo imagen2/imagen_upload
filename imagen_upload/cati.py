@@ -12,11 +12,11 @@ import os
 
 LOGGER = None
 CATI_WORFLOW_DIRECTORY = None
-SENT_FILE = 'sent.txt'
-RESPONSE_FILE = 'response.txt'
-DONE_FILE = 'done.txt'
+SENT_FILE = 'sent.csv'
+RESPONSE_FILE = 'response.csv'
+DONE_FILE = 'done.csv'
 LINE_SEP = '\n'
-COL_SEP = '\t'
+COL_SEP = ';'
 
 
 ##############################################################################
