@@ -32,12 +32,11 @@ SYSTEM_ERROR_RAISED = ("<dl><dt>A system error raised.<dt>"
                        " to an administrator.</dd></dl>")
 
 
-def get_message_error(flag, errors, filename, pattern, filepath):
+def get_message_error(errors, filename, pattern, filepath):
     """ Generate a message error from error list regarding an uploaded file.
 
 
     Pameters:
-        flag: True or False. True mean 'has errors'
         errors: error list
         filename: file name provide by user during upload
         pattern: pattern expected for file name
@@ -45,7 +44,7 @@ def get_message_error(flag, errors, filename, pattern, filepath):
     """
 
     message = ''
-    if not flag:
+    if errors:
         message += u'<dl>'
         message += u'<dt>File {} [{}]<dt>'.format(filename, pattern)
         for err in errors:
@@ -141,53 +140,57 @@ def synchrone_check_cantab(connexion, posted, upload, files, fields):
     #dimitri check
     sid = posted['sid']
     tid = posted['time_point']
+    date = posted['acquisition_date']
     psc1 = True
     errors = None
     for ufile in files:
         if ufile.name == 'cant':
             psc1, errors = cantab.check_cant_name(
-                ufile.data_name, sid, tid)
+                ufile.data_name, tid, sid)
             message += get_message_error(
-                psc1, errors, ufile.data_name,
+                errors, ufile.data_name,
                 u'cant_&lt;PSC1&gt;&lt;TP&gt;.cclar', ufile.data_name)
             filepath = ufile.get_file_path()
-            psc1, errors = cantab.check_cant_content(filepath, sid, tid)
+            psc1, errors = cantab.check_cant_content(filepath, tid, sid, date)
             message += get_message_error(
-                psc1, errors, ufile.data_name,
+                errors, ufile.data_name,
                 u'cant_&lt;PSC1&gt;&lt;TP&gt;.cclar', filepath)
         elif ufile.name == 'datasheet':
             psc1, errors = cantab.check_datasheet_name(
-                ufile.data_name, sid, tid)
+                ufile.data_name, tid, sid)
             message += get_message_error(
-                psc1, errors, ufile.data_name,
+                errors, ufile.data_name,
                 u'datasheet_&lt;PSC1&gt;&lt;TP&gt;.csv', ufile.data_name)
             filepath = ufile.get_file_path()
-            psc1, errors = cantab.check_datasheet_content(filepath, sid, tid)
+            psc1, errors = cantab.check_datasheet_content(
+                filepath, tid, sid, date)
             message += get_message_error(
-                psc1, errors, ufile.data_name,
+                errors, ufile.data_name,
                 u'datasheet_&lt;PSC1&gt;&lt;TP&gt;.csv', filepath)
         elif ufile.name == 'detailed_datasheet':
             psc1, errors = cantab.check_detailed_datasheet_name(
-                ufile.data_name, sid, tid)
+                ufile.data_name, tid, sid)
             message += get_message_error(
-                psc1, errors, ufile.data_name,
-                u'detailed_datasheet_&lt;PSC1&gt;&lt;TP&gt;.csv', ufile.data_name)
+                errors, ufile.data_name,
+                u'detailed_datafunctionsheet_&lt;PSC1&gt;&lt;TP&gt;.csv',
+                ufile.data_name)
             filepath = ufile.get_file_path()
             psc1, errors = cantab.check_detailed_datasheet_content(
-                filepath, sid, tid)
+                filepath, tid, sid, date)
             message += get_message_error(
-                psc1, errors, ufile.data_name,
+                errors, ufile.data_name,
                 u'detailed_datasheet_&lt;PSC1&gt;&lt;TP&gt;.csv', filepath)
         elif ufile.name == 'report':
             psc1, errors = cantab.check_report_name(
-                ufile.data_name, sid, tid)
+                ufile.data_name, tid, sid)
             message += get_message_error(
-                psc1, errors, ufile.data_name,
+                errors, ufile.data_name,
                 u'report_&lt;PSC1&gt;&lt;TP&gt;.html', ufile.data_name)
             filepath = ufile.get_file_path()
-            psc1, errors = cantab.check_report_content(filepath, sid, tid)
+            psc1, errors = cantab.check_report_content(
+                filepath, tid, sid, date)
             message += get_message_error(
-                psc1, errors, ufile.data_name,
+                errors, ufile.data_name,
                 u'report_&lt;PSC1&gt;&lt;TP&gt;.html', filepath)
 
     # return
@@ -279,16 +282,17 @@ def synchrone_check_rmi(connexion, posted, upload, files, fields):
     #dimitri check
     sid = posted['sid']
     tid = posted['time_point']
+    date = posted['acquisition_date']
     psc1 = True
     errors = None
     filepath = files[0].get_file_path()
-    psc1, errors = imaging.check_zip_name(files[0].data_name, sid, tid)
+    psc1, errors = imaging.check_zip_name(files[0].data_name, tid, sid)
     message += get_message_error(
-        psc1, errors, files[0].data_name,
+        errors, files[0].data_name,
         u'&lt;PSC1&gt;&lt;TP&gt;.zip', files[0].data_name)
-    psc1, errors = imaging.check_zip_content(filepath, sid, tid)
+    psc1, errors = imaging.check_zip_content(filepath, tid, sid, date)
     message += get_message_error(
-        psc1, errors, files[0].data_name,
+        errors, files[0].data_name,
         u'&lt;PSC1&gt;&lt;TP&gt;.zip', filepath)
 
     # return
