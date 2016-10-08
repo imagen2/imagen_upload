@@ -50,7 +50,7 @@ class Imagen_CWUploadPrimaryView(PrimaryView):
         self.w(u'<table class="upload-table">')
         self.w(u'<tr><th>Name</th><th>Value</th></tr>')
         for eField in sorted(eUpload.upload_fields,
-                             key=lambda field:field.name):
+                             key=lambda field: field.name):
             self.w(u'<tr><td>{0}</td><td>{1}</td></tr>'.format(
                    eField.label, eField.value))
         self.w(u'</table>')
@@ -61,7 +61,7 @@ class Imagen_CWUploadPrimaryView(PrimaryView):
         self.w(u'<table class="upload-table">')
         self.w(u'<tr><th>Name</th><th>SHA1</th></tr>')
         for eFile in sorted(eUpload.upload_files,
-                            key=lambda field:field.name):
+                            key=lambda field: field.name):
             self.w(u'<tr><td>{0}</td><td>{1}</td></tr>'.format(
                    eFile.data_name, eFile.data_sha1hex))
         self.w(u'</table>')

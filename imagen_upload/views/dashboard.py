@@ -109,7 +109,7 @@ class DashboardView(View):
                                 href = self._cw.build_url(
                                     "view",
                                     rql=("Any U WHERE U is CWUpload"
-                                           ", U eid '{}'".format(eid))
+                                         ", U eid '{}'".format(eid))
                                 )
                                 icon = ''
                                 if status == 'Quarantine':
