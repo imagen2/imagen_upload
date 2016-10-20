@@ -6,7 +6,7 @@
 # http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html
 # for details.
 
-"""cubicweb-imagen-upload automatic tests
+"""imagen-upload automatic tests
 
 
 uncomment code below if you want to activate automatic test for your cube:

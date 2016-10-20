@@ -7,7 +7,7 @@
 # http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html
 # for details.
 
-"""cubicweb-imagen-upload postcreate script, executed at instance creation time or when
+"""imagen-upload postcreate script, executed at instance creation time or when
 the cube is added to an existing instance.
 
 You could setup site properties or a workflow here for example.
