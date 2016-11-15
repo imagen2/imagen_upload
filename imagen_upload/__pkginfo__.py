@@ -7,7 +7,7 @@ distname = 'cubicweb-imagen-upload'
 numversion = (0, 1, 0)
 version = '.'.join(str(num) for num in numversion)
 
-license = 'CeCILL-B'
+license = 'CeCILL'
 author = 'CEA'
 author_email = 'imagendatabase@cea.fr'
 description = 'Cantab and MRI data collection for Imagen follow-up 3'

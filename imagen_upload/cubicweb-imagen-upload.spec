@@ -13,7 +13,7 @@ Version:        0.1.0
 Release:        logilab.1%{?dist}
 Summary:        Cantab and MRI data collection for Imagen follow-up 3
 Group:          Applications/Internet
-License:        CeCILL-B
+License:        CeCILL
 Source0:        cubicweb-imagen-upload-%{version}.tar.gz
 
 BuildArch:      noarch
