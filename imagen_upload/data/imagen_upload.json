@@ -174,7 +174,7 @@
 				"max_length" : 255
 			},
 			{
-				"name": "ss",
+				"name": "sst",
 				"type": "StringField",
 				"choices": ["Good","Doubtful","Bad","Missing"],
 				"sort":"False",
@@ -182,7 +182,7 @@
 				"label": "Stop-signal task (SST)"
 			},
 			{
-				"name": "ss_desc",
+				"name": "sst_desc",
 				"type": "StringField",
 				"value": "",
 				"label": " ",
@@ -228,6 +228,21 @@
 			},
 			{
 				"name": "rs_desc",
+				"type": "StringField",
+				"value": "",
+				"label": " ",
+				"max_length" : 255
+			},
+			{
+				"name": "recog",
+				"type": "StringField",
+				"choices": ["Good","Doubtful","Bad","Missing"],
+				"sort":"False",
+				"value": "Good",
+				"label": "Recognition Test"
+			},
+			{
+				"name": "recog_desc",
 				"type": "StringField",
 				"value": "",
 				"label": " ",

@@ -37,6 +37,13 @@ import traceback
 
 from cubes.rql_upload.tools import get_or_create_logger
 from imagen.sanity import cantab, imaging
+from imagen import (MID_CSV, FT_CSV, SS_CSV, RECOG_CSV)
+from imagen import (SEQUENCE_LOCALIZER_CALIBRATION,
+                    SEQUENCE_T2, SEQUENCE_T2_FLAIR,
+                    SEQUENCE_ADNI_MPRAGE,
+                    SEQUENCE_MID, SEQUENCE_FT, SEQUENCE_SST,
+                    SEQUENCE_B0_MAP, SEQUENCE_DTI,
+                    SEQUENCE_RESTING_STATE)
 from . import cati
 
 SID_ERROR_MESSAGE = ("<dl><dt>The subject ID is malformed.</dt>"
@@ -78,7 +85,7 @@ def get_message_error(errors, filename, pattern, filepath):
                 if len(sample) > err._SAMPLE_LEN:
                     sample = sample[:err._SAMPLE_LEN] + '...'
                 message += u' [{}]'.format(sample)
-            message += u'</dd>'
+            message += u'<dd>'
         message += u'</dl>'
     return message.replace(os.path.basename(filepath), filename)
 
@@ -151,17 +158,18 @@ def synchrone_check_cantab(connexion, posted, upload, files, fields):
     """
 
     message = ''
+
+    sid = posted['sid']
+    tid = posted['time_point']
+    date = posted['acquisition_date']
+
     # checks
-    # checks
-    if not is_PSC1(posted['sid']):
+    if not is_PSC1(sid):
         message += SID_ERROR_MESSAGE
     if is_aldready_uploaded(connexion, posted, upload.form_name, upload.eid):
         message += UPLOAD_ALREADY_EXISTS
 
-    #dimitri check
-    sid = posted['sid']
-    tid = posted['time_point']
-    date = posted['acquisition_date']
+    # dimitri check
     psc1 = True
     errors = None
     for ufile in files:
@@ -294,16 +302,33 @@ def synchrone_check_rmi(connexion, posted, upload, files, fields):
     """
 
     message = ''
+
+    sid = posted['sid']
+    tid = posted['time_point']
+    date = posted['acquisition_date']
+    expected = {
+        SEQUENCE_T2: posted['t2'],
+        SEQUENCE_T2_FLAIR: posted['flair'],
+        SEQUENCE_ADNI_MPRAGE: posted['adni_mprage'],
+        SEQUENCE_MID: posted['mid'],
+        MID_CSV: posted['mid'],
+        SEQUENCE_FT: posted['ft'],
+        FT_CSV: posted['ft'],
+        SEQUENCE_SST: posted['sst'],
+        SS_CSV: posted['sst'],
+        SEQUENCE_B0_MAP: posted['b0'],
+        SEQUENCE_DTI: posted['dti'],
+        SEQUENCE_RESTING_STATE: posted['rs'],
+        RECOG_CSV: posted['recog'],
+    }
+
     # checks
-    if not is_PSC1(posted['sid']):
+    if not is_PSC1(sid):
         message += SID_ERROR_MESSAGE
     if is_aldready_uploaded(connexion, posted, upload.form_name, upload.eid):
         message += UPLOAD_ALREADY_EXISTS
 
-    #dimitri check
-    sid = posted['sid']
-    tid = posted['time_point']
-    date = posted['acquisition_date']
+    # dimitri check
     psc1 = True
     errors = None
     filepath = files[0].get_file_path()
@@ -311,7 +336,7 @@ def synchrone_check_rmi(connexion, posted, upload, files, fields):
     message += get_message_error(
         errors, files[0].data_name,
         u'&lt;PSC1&gt;&lt;TP&gt;.zip', files[0].data_name)
-    psc1, errors = imaging.check_zip_content(filepath, tid, sid, date)
+    psc1, errors = imaging.check_zip_content(filepath, tid, sid, date, expected)
     message += get_message_error(
         errors, files[0].data_name,
         u'&lt;PSC1&gt;&lt;TP&gt;.zip', filepath)
