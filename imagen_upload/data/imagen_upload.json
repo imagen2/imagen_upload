@@ -174,7 +174,7 @@
 				"max_length" : 255
 			},
 			{
-				"name": "sst",
+				"name": "ss",
 				"type": "StringField",
 				"choices": ["Good","Doubtful","Bad","Missing"],
 				"sort":"False",
@@ -182,7 +182,7 @@
 				"label": "Stop-signal task (SST)"
 			},
 			{
-				"name": "sst_desc",
+				"name": "ss_desc",
 				"type": "StringField",
 				"value": "",
 				"label": " ",
