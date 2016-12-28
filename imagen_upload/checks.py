@@ -55,8 +55,8 @@ UPLOAD_ALREADY_EXISTS = ("<dl><dt>A similar upload already exists.</dt>"
                          "<dd>Please contact an administrator if you want"
                          " to force the upload.</dd></dl>")
 
-SYSTEM_ERROR_RAISED = ("<dl><dt>A system error raised.<dt>"
-                       " Please send the following message"
+SYSTEM_ERROR_RAISED = ("<dl><dt>A system error raised.</dt>"
+                       "<dd> Please send the following message"
                        " to an administrator.</dd></dl>")
 
 
@@ -85,7 +85,7 @@ def get_message_error(errors, filename, pattern, filepath):
                 if len(sample) > err._SAMPLE_LEN:
                     sample = sample[:err._SAMPLE_LEN] + '...'
                 message += u' [{}]'.format(sample)
-            message += u'<dd>'
+            message += u'</dd>'
         message += u'</dl>'
     return message.replace(os.path.basename(filepath), filename)
 
