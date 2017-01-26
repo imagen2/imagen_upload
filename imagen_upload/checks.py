@@ -50,14 +50,14 @@ SID_ERROR_MESSAGE = ("<dl><dt>The subject ID is malformed.</dt>"
                      "<dd>12 decimal digits required.</dd></dl>")
 
 UPLOAD_ALREADY_EXISTS = ("<dl><dt>A similar upload already exists.</dt>"
-                         "<dd>Same subject ID and time point "
-                         " and not rejected upload.</dd>"
+                         "<dd>Same subject ID and time point,"
+                         " and upload not rejected.</dd>"
                          "<dd>Please contact an administrator if you want"
                          " to force the upload.</dd></dl>")
 
 SYSTEM_ERROR_RAISED = ("<dl><dt>A system error raised.</dt>"
                        "<dd> Please send the following message"
-                       " to an administrator.</dd></dl>")
+                       " to imagendatabase@cea.fr.</dd></dl>")
 
 
 def get_message_error(errors, filename, pattern, filepath):
