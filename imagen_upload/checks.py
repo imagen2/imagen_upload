@@ -263,6 +263,7 @@ def asynchrone_check_cantab(repository):
                         hashlib.sha1(open(to_file, 'rb').read()).hexdigest())
                     if sha1 == eUFile.data_sha1hex:
                         os.remove(from_file)
+                        to_file = os.path.relpath(to_file, os.path.dirname(from_file))
                         os.symlink(to_file, from_file)
                         logger.info(
                             ("Copy from '{}' to '{}'"
