@@ -171,7 +171,6 @@ def synchrone_check_cantab(connexion, posted, upload, files, fields):
         message += UPLOAD_ALREADY_EXISTS
 
     # Dimitri's sanity check
-    psc1 = True
     errors = None
     for ufile in files:
         if ufile.name == 'cant':
