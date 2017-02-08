@@ -35,14 +35,14 @@ import shutil
 import traceback
 
 from cubes.rql_upload.tools import get_or_create_logger
-from imagen.sanity import cantab, imaging
-from imagen import (MID_CSV, FT_CSV, SS_CSV, RECOG_CSV)
-from imagen import (SEQUENCE_LOCALIZER_CALIBRATION,
-                    SEQUENCE_T2, SEQUENCE_T2_FLAIR,
-                    SEQUENCE_ADNI_MPRAGE,
-                    SEQUENCE_MID, SEQUENCE_FT, SEQUENCE_SST,
-                    SEQUENCE_B0_MAP, SEQUENCE_DTI,
-                    SEQUENCE_RESTING_STATE)
+from imagen_databank.sanity import cantab, imaging
+from imagen_databank import (MID_CSV, FT_CSV, SS_CSV, RECOG_CSV)
+from imagen_databank import (SEQUENCE_LOCALIZER_CALIBRATION,
+                             SEQUENCE_T2, SEQUENCE_T2_FLAIR,
+                             SEQUENCE_ADNI_MPRAGE,
+                             SEQUENCE_MID, SEQUENCE_FT, SEQUENCE_SST,
+                             SEQUENCE_B0_MAP, SEQUENCE_DTI,
+                             SEQUENCE_RESTING_STATE)
 from . import cati
 
 VALIDATED_ADD_PATH_AFTER_TP = os.path.join('RAW', 'PSC1')
