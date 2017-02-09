@@ -45,8 +45,6 @@ from imagen_databank import (SEQUENCE_LOCALIZER_CALIBRATION,
                              SEQUENCE_RESTING_STATE)
 from . import cati
 
-VALIDATED_ADD_PATH_AFTER_TP = os.path.join('RAW', 'PSC1')
-
 SID_ERROR_MESSAGE = ("<dl><dt>The subject ID is malformed.</dt>"
                      "<dd>12 decimal digits required.</dd></dl>")
 
@@ -252,8 +250,8 @@ def asynchrone_check_cantab(repository):
                 for eUFile in entity.upload_files:
                     from_file = eUFile.get_file_path()
                     to_file = os.path.join(validated_dir,
-                                           tp, VALIDATED_ADD_PATH_AFTER_TP,
-                                           centre, sid)
+                                           tp, 'RAW', 'PSC1',
+                                           centre, sid, 'AdditionnalData')
                     if not os.path.exists(to_file):
                         os.makedirs(to_file)
                     to_file = os.path.join(to_file, eUFile.data_name)
@@ -397,8 +395,8 @@ def asynchrone_check_rmi(repository):
                 else:
                     from_file = entity.upload_files[0].get_file_path()
                     to_file = os.path.join(validated_dir,
-                                           tp, VALIDATED_ADD_PATH_AFTER_TP,
-                                           centre, sid)
+                                           tp, 'RAW', 'PSC1',
+                                           centre)
                     if not os.path.exists(to_file):
                         os.makedirs(to_file)
                     to_file = os.path.join(to_file, entity.upload_files[0].data_name)
