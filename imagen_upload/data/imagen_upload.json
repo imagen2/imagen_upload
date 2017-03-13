@@ -234,6 +234,21 @@
 				"max_length" : 255
 			},
 			{
+				"name": "noddi",
+				"type": "StringField",
+				"choices": ["Good","Doubtful","Bad","Missing"],
+				"sort":"False",
+				"value": "Good",
+				"label": "Resting State"
+			},
+			{
+				"name": "noddi_desc",
+				"type": "StringField",
+				"value": "",
+				"label": " ",
+				"max_length" : 255
+			},
+			{
 				"name": "recog",
 				"type": "StringField",
 				"choices": ["Good","Doubtful","Bad","Missing"],
