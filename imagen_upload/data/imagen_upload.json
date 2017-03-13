@@ -239,7 +239,7 @@
 				"choices": ["Good","Doubtful","Bad","Missing"],
 				"sort":"False",
 				"value": "Good",
-				"label": "Resting State"
+				"label": "NODDI"
 			},
 			{
 				"name": "noddi_desc",
