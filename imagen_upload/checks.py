@@ -54,8 +54,8 @@ UPLOAD_ALREADY_EXISTS = ("<dl><dt>A similar upload already exists.</dt>"
                          "<dd>Please contact an administrator if you want"
                          " to force the upload.</dd></dl>")
 
-SYSTEM_ERROR_RAISED = ("<dl><dt>A system error raised.</dt>"
-                       "<dd> Please send the following message"
+SYSTEM_ERROR_RAISED = ("<dl><dt>System error</dt>"
+                       "<dd>Please send the following message"
                        " to imagendatabase@cea.fr.</dd></dl>")
 
 
