@@ -42,7 +42,8 @@ from imagen_databank import (SEQUENCE_LOCALIZER_CALIBRATION,
                              SEQUENCE_ADNI_MPRAGE,
                              SEQUENCE_MID, SEQUENCE_FT, SEQUENCE_SST,
                              SEQUENCE_B0_MAP, SEQUENCE_DTI,
-                             SEQUENCE_RESTING_STATE)
+                             SEQUENCE_RESTING_STATE,
+                             SEQUENCE_NODDI)
 from . import cati
 
 SID_ERROR_MESSAGE = ("<dl><dt>The subject ID is malformed.</dt>"
@@ -319,6 +320,7 @@ def synchrone_check_rmi(connexion, posted, upload, files, fields):
         SEQUENCE_B0_MAP: posted['b0'],
         SEQUENCE_DTI: posted['dti'],
         SEQUENCE_RESTING_STATE: posted['rs'],
+        SEQUENCE_NODDI: posted['noddi'],
         RECOG_CSV: posted['recog'],
     }
 
