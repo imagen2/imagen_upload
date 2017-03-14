@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2016 CEA
+# Copyright (c) 2017 CEA
 #
 # This software is governed by the CeCILL license under French law and
 # abiding by the rules of distribution of free software. You can use,
@@ -43,7 +43,7 @@ class IMAGENIndexView(IndexView):
         """ Create the 'index' like page of our site.
         """
         # Get the card that contains some text description about this site
-        self.w(u"<h2>Welcome to IMAGEN follow-up 3 data collection platform<h2>")
+        self.w(u"<h2>Welcome to the Imagen follow-up 3 upload portal<h2>")
         rset = self._cw.execute("Any X WHERE X is Card, X title 'index'")
 
 
