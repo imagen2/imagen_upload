@@ -289,7 +289,7 @@ def asynchrone_check_cantab(repository):
 
 def synchrone_check_rmi(connexion, posted, upload, files, fields):
     """ Call is_PSC1 and is_aldready_uploaded methods first.
-        Then call methods of imagen.sanity.imaging
+        Then call methods of imagen_databank.sanity.imaging
         than checks name file and content
 
     Parameters:
