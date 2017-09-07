@@ -124,7 +124,7 @@ def _consistent_prefix_suffix(sid, tid):
         '010000',  # Imagen LONDON subects / Stratify LONDON controls
     }
     prefix = sid[:6]
-    if prefix in fu3_sb:
+    if prefix in sb_fu3:
         return True  # most usually FU3, but could be SB
     elif prefix in sb:
         return tid == 'SB'
