@@ -105,6 +105,33 @@ def is_PSC1(value):
         return True
 
 
+def _consistent_prefix_suffix(sid, tid):
+    """ For Stratify B, checks if PSC1 code is consistent with suffix
+
+    Parameters:
+        sid: PSC1 code.
+        timepoint: expected suffix.
+
+    Return:
+        Return True if psc1 is consistent with timepoint, False otherwise.
+    """
+    sb = {
+        '010001',  # Stratify LONDON controls
+        '090000',  # Stratify SOUTHAMPTON patients
+        '090001',  # Stratify SOUTHAMPTON controls
+    }
+    sb_fu3 = {
+        '010000',  # Imagen LONDON subects / Stratify LONDON controls
+    }
+    prefix = sid[:6]
+    if prefix in fu3_sb:
+        return True  # most usually FU3, but could be SB
+    elif prefix in sb:
+        return tid == 'SB'
+    else:
+        return tid == 'FU3'
+
+
 def is_aldready_uploaded(connexion, posted, formname, uid):
     """ Checks if an equivalent upload is already done.
         To be equivalent an upload must have:
@@ -220,6 +247,13 @@ def synchrone_check_cantab(connexion, posted, upload, files, fields):
             message += get_message_error(
                 errors, ufile.data_name,
                 u'report_&lt;PSC1&gt;&lt;TP&gt;.html', filepath)
+    # new check to distinguish Stratify from Imagen
+    if not _consistent_prefix_suffix(sid, tid):
+        message += u'<dl>'
+        message += u'<dt>PSC1 code {}<dt>'.format(sid)
+        message += u'<dd>PSC1 codes starting with {}'.format(sid[:6])
+        message += u' cannot be used with time point {}</dd>'.format(tid)
+        message += u'</dl>'
 
     # return
     if message:
@@ -342,6 +376,13 @@ def synchrone_check_rmi(connexion, posted, upload, files, fields):
     message += get_message_error(
         errors, files[0].data_name,
         u'&lt;PSC1&gt;&lt;TP&gt;.zip', filepath)
+    # new check to distinguish Stratify from Imagen
+    if not _consistent_prefix_suffix(sid, tid):
+        message += u'<dl>'
+        message += u'<dt>PSC1 code {}<dt>'.format(sid)
+        message += u'<dd>PSC1 codes starting with {}'.format(sid[:6])
+        message += u' cannot be used with time point {}</dd>'.format(tid)
+        message += u'</dl>'
 
     # return
     if message:
