@@ -286,7 +286,7 @@ def asynchrone_check_cantab(repository):
                     from_file = eUFile.get_file_path()
                     to_file = os.path.join(validated_dir,
                                            tp, 'RAW', 'PSC1',
-                                           centre, sid, 'AdditionnalData')
+                                           centre, sid, 'AdditionalData')
                     if not os.path.exists(to_file):
                         os.makedirs(to_file)
                     to_file = os.path.join(to_file, eUFile.data_name)
