@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2016-2017 CEA
+# Copyright (c) 2016-2018 CEA
 #
 # This software is governed by the CeCILL license under French law and
 # abiding by the rules of distribution of free software. You can use,
@@ -116,9 +116,12 @@ def _consistent_prefix_suffix(sid, tid):
         Return True if psc1 is consistent with timepoint, False otherwise.
     """
     sb = {
-        '010001',  # Stratify LONDON controls
-        '090000',  # Stratify SOUTHAMPTON patients
-        '090001',  # Stratify SOUTHAMPTON controls
+        '010001',  # Stratify LONDON patients
+        '040001',  # Stratify BERLIN patients
+        '090000',  # Stratify SOUTHAMPTON controls
+        '090001',  # Stratify SOUTHAMPTON patients
+        '091000',  # Stratify AACHEN controls
+        '091001',  # Stratify AACHEN patients
     }
     sb_fu3 = {
         '010000',  # Imagen LONDON subects / Stratify LONDON controls
