@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2016-2018 CEA
+# Copyright (c) 2016-2019 CEA
 #
 # This software is governed by the CeCILL license under French law and
 # abiding by the rules of distribution of free software. You can use,
@@ -71,7 +71,7 @@ def get_message_error(errors, filename, pattern, filepath):
         filepath: file path used by CW for uploaded file
     """
 
-    message = ''
+    message = u''
     if errors:
         message += u'<dl>'
         message += u'<dt>File {} [{}]<dt>'.format(filename, pattern)
@@ -124,7 +124,7 @@ def _consistent_prefix_suffix(sid, tid):
         '091001',  # Stratify AACHEN patients
     }
     sb_fu3 = {
-        '010000',  # Imagen LONDON subects / Stratify LONDON controls
+        '010000',  # Imagen LONDON participants / Stratify LONDON controls
     }
     prefix = sid[:6]
     if prefix in sb_fu3:
