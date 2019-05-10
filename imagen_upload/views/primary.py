@@ -60,7 +60,7 @@ class Imagen_CWUploadPrimaryView(PrimaryView):
         self.w(u'<div>')
         self.w(u'<h3>Status</h3>')
         self.w(u'<b>{}</b>'.format(eUpload.status))
-        print 'error: {}'.format(eUpload.error)
+        print('error: {}'.format(eUpload.error))
         if eUpload.error:
             self.w(u'<div class="panel panel-danger">{}</div>'.format(
                 eUpload.error))

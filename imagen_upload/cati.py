@@ -177,7 +177,7 @@ def add_sent(entry):
 
 ##############################################################################
 def send_file_by_sftp(filepath, fields):
-    print 'cati.send_file_by_sftp NOT IMPLEMENTED'
+    print('cati.send_file_by_sftp NOT IMPLEMENTED')
 
 
 ##############################################################################

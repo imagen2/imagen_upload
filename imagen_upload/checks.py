@@ -165,7 +165,7 @@ def is_aldready_uploaded(connexion, posted, formname, uid):
         posted['time_point']
     )
     rset = connexion.execute(rql)
-    if rset.rows[0][0] == 0L:
+    if rset.rows[0][0] == 0:
         return False
     else:
         return True

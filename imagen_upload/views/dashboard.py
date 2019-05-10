@@ -48,7 +48,7 @@ class DashboardView(View):
         if "?" in path:
             path, param = path.split("?", 1)
             kwargs.update(parse_qs(param))
-            print kwargs
+            print(kwargs)
         # query data
         rql = "Any UP ORDERBY UP DESC WHERE UP is CWUpload,"
         if 'user' in kwargs.keys():
